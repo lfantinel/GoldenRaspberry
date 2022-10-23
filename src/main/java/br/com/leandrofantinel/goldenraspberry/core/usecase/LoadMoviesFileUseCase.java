@@ -2,7 +2,7 @@ package br.com.leandrofantinel.goldenraspberry.core.usecase;
 
 import br.com.leandrofantinel.goldenraspberry.core.model.Movie;
 import br.com.leandrofantinel.goldenraspberry.core.port.in.LoadMoviesFile;
-import br.com.leandrofantinel.goldenraspberry.core.port.out.MovieDataStore;
+import br.com.leandrofantinel.goldenraspberry.core.port.out.MovieDatasourcePort;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -11,10 +11,10 @@ import java.util.List;
 public class LoadMoviesFileUseCase {
 
     private final LoadMoviesFile csvDatastore;
-    private final MovieDataStore datastore;
+    private final MovieDatasourcePort datastore;
 
     public void execute(String fileName) {
         List<Movie> list = csvDatastore.loadCsv(fileName);
-        datastore.save(list);
+        datastore.saveAll(list);
     }
 }

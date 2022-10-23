@@ -5,31 +5,27 @@ import br.com.leandrofantinel.goldenraspberry.adapters.mapper.MovieMapper;
 import br.com.leandrofantinel.goldenraspberry.adapters.repository.csv.movie.MovieCsv;
 import br.com.leandrofantinel.goldenraspberry.adapters.repository.csv.movie.MovieCsvRepository;
 import br.com.leandrofantinel.goldenraspberry.adapters.repository.jpa.MovieRepository;
-import br.com.leandrofantinel.goldenraspberry.adapters.repository.jpa.StudioRepository;
 import br.com.leandrofantinel.goldenraspberry.adapters.repository.jpa.entity.MovieEntity;
-import br.com.leandrofantinel.goldenraspberry.adapters.repository.jpa.entity.StudioEntity;
 import br.com.leandrofantinel.goldenraspberry.core.model.Movie;
-import br.com.leandrofantinel.goldenraspberry.core.model.Studio;
 import br.com.leandrofantinel.goldenraspberry.core.port.in.LoadMoviesFile;
-import br.com.leandrofantinel.goldenraspberry.core.port.out.MovieDataStore;
-import br.com.leandrofantinel.goldenraspberry.util.json.MapperUtil;
+import br.com.leandrofantinel.goldenraspberry.core.port.out.MovieDatasourcePort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
-class MovieDatastoreImpl implements MovieDataStore, LoadMoviesFile {
+class MovieDatasourceImpl
+        implements MovieDatasourcePort, LoadMoviesFile,
+        GenericDatasource<Movie, MovieEntity> {
 
     private final MovieCsvRepository csvRepository;
     private final MovieCsvMapper csvMapper;
     private final MovieRepository movieRepository;
     private final MovieMapper movieMapper;
-    private final StudioRepository studioRepository;
-    private final MapperUtil<Studio, StudioEntity> studioMapper;
+
     @Override
     public List<Movie> loadCsv(String fileName) {
         InputStream is = getClass().getClassLoader().getResourceAsStream(fileName);
@@ -38,9 +34,13 @@ class MovieDatastoreImpl implements MovieDataStore, LoadMoviesFile {
     }
 
     @Override
-    public List<Movie> save(List<Movie> list) {
-        List<MovieEntity> transientList = movieMapper.convert(list);
-        List<MovieEntity> persistentList = movieRepository.saveAll(Objects.requireNonNull(transientList));
-        return movieMapper.revert(persistentList);
+    public MovieRepository getRepository() {
+        return movieRepository;
     }
+
+    @Override
+    public MovieMapper getMapper() {
+        return movieMapper;
+    }
+
 }

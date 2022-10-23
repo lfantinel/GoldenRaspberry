@@ -22,7 +22,7 @@ public class MovieEntity extends AbstractEntity{
     private Boolean winner;
 
     @JsonIgnore
-    @ManyToMany(cascade = {PERSIST,MERGE})
+    @ManyToMany(cascade = {PERSIST,MERGE}, fetch = FetchType.EAGER)
     @JoinTable(name = "movie_studio",
             joinColumns = { @JoinColumn(name = "movie_id") },
             inverseJoinColumns = { @JoinColumn(name = "studio_id") })

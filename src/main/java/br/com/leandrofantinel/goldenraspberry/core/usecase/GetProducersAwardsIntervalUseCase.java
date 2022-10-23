@@ -1,6 +1,6 @@
 package br.com.leandrofantinel.goldenraspberry.core.usecase;
 
-import br.com.leandrofantinel.goldenraspberry.core.port.out.ProducerDataStore;
+import br.com.leandrofantinel.goldenraspberry.core.port.out.ProducerDatasourcePort;
 import lombok.RequiredArgsConstructor;
 
 import java.util.HashMap;
@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class GetProducersAwardsIntervalUseCase {
-    private final ProducerDataStore datastore;
+    private final ProducerDatasourcePort datastore;
 
     public Map<String, Object> execute() {
         Map<String, Object> data = new HashMap<>();
