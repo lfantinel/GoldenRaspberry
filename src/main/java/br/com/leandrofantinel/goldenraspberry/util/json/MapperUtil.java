@@ -21,6 +21,7 @@ public class MapperUtil <From, To> {
     private final Class<To> classTo;
 
     private final Map<Class<?>, Map<String, Object>> mInstancePool = new HashMap<>();
+    private boolean clearEnable = true;
 
     public MapperUtil(Class<From> classFrom, Class<To> classTo, ObjectMapper mapper) {
         this.mapper = mapper;
@@ -70,6 +71,7 @@ public class MapperUtil <From, To> {
     protected final To convert (From obj, BiConsumer<From, To> map) {
         To to = _convert(obj, classTo);
         if (map != null) map.accept(obj, to);
+        if (clearEnable) clear();
         return to;
     }
     public To convert (From obj) {
@@ -79,6 +81,7 @@ public class MapperUtil <From, To> {
     protected final From revert (To obj, BiConsumer<To, From> map) {
         From from = _convert(obj, classFrom);
         if (map != null) map.accept(obj, from);
+        if (clearEnable) clear();
         return from;
     }
 
@@ -97,29 +100,55 @@ public class MapperUtil <From, To> {
 
     public final List<To> convert (List<From> list) {
         try {
+            this.clearEnable = false;
             return list.stream().map(this::convert).collect(Collectors.toList());
         } catch (Exception e){
             log.error("Erro ao converter Lista. {}", e.getMessage());
             return null;
+        } finally {
+            this.clearEnable = true;
+            this.clear();
         }
     }
 
     public final Set<To> convert (Set<From> list) {
         try {
+            this.clearEnable = false;
             return list.stream().map(this::convert).collect(Collectors.toSet());
         } catch (Exception e){
             log.error("Erro ao converter Lista. {}", e.getMessage());
             return null;
+        } finally {
+            this.clearEnable = true;
+            clear();
         }
     }
 
     public final List<From> revert (List<To> list) {
         try {
+            this.clearEnable = false;
             return list.stream().map(this::revert).collect(Collectors.toList());
         } catch (Exception e){
             e.printStackTrace();
             log.error("Erro ao converter Lista. {}", e.getMessage());
             return null;
+        } finally {
+            this.clearEnable = true;
+            clear();
+        }
+    }
+
+    public final Set<From> revert (Set<To> list) {
+        try {
+            this.clearEnable = false;
+            return list.stream().map(this::revert).collect(Collectors.toSet());
+        } catch (Exception e){
+            e.printStackTrace();
+            log.error("Erro ao converter Lista. {}", e.getMessage());
+            return null;
+        } finally {
+            this.clearEnable = true;
+            clear();
         }
     }
 
@@ -128,6 +157,10 @@ public class MapperUtil <From, To> {
         Map<String, Object> instances = mInstancePool.get(type);
         if (!instances.containsKey(key)) instances.put(key, supplier.get());
         return (T) instances.get(key);
+    }
+
+    private void clear(){
+        if (mInstancePool != null) mInstancePool.clear();
     }
 
 }
