@@ -15,12 +15,12 @@ public class GetProducersAwardsIntervalUseCase {
     public Map<String, Object> execute() {
         Map<String, Object> data = new HashMap<>();
         Set<Map<String, Object>> list = datastore.getProducerAwardsIntervals();
-        data.put("min", getFasterAwardInterval(list));
+        data.put("min", getMinAwardInterval(list));
         data.put("max", getMaxAwardInterval(list));
         return data;
     }
 
-    private Set<Map<String, Object>> getFasterAwardInterval(Set<Map<String, Object>> list) {
+    private Set<Map<String, Object>> getFasterAward(Set<Map<String, Object>> list) {
         int first = list.stream().mapToInt(e->(Integer)e.get("previousWin")).min().orElse(-1);
         int faster = list.stream().mapToInt(e->(Integer)e.get("followingWin") - first).min().orElse(-1);
         return list.stream().filter(e -> ((Integer)e.get("followingWin") - first) == faster).collect(Collectors.toSet());
@@ -29,6 +29,11 @@ public class GetProducersAwardsIntervalUseCase {
     private Set<Map<String, Object>> getMaxAwardInterval(Set<Map<String, Object>> list) {
         int longest = list.stream().mapToInt(e->(Integer)e.get("interval")).max().orElse(-1);
         return list.stream().filter(e -> ((Integer)e.get("interval")) == longest).collect(Collectors.toSet());
+    }
+
+    private Set<Map<String, Object>> getMinAwardInterval(Set<Map<String, Object>> list) {
+        int shorter = list.stream().mapToInt(e->(Integer)e.get("interval")).min().orElse(-1);
+        return list.stream().filter(e -> ((Integer)e.get("interval")) == shorter).collect(Collectors.toSet());
     }
 
 

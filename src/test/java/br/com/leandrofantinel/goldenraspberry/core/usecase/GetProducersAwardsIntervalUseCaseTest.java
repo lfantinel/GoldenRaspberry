@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.io.Serializable;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -16,15 +18,34 @@ public class GetProducersAwardsIntervalUseCaseTest {
 
     @Test
     public void getProducersAwardsIntervalTest() {
+
+        final Map<String, Object>
+            MIN = Map.of(
+                "producer", "Joel Silver",
+                "interval", 1,
+                "previousWin", 1990,
+                "followingWin", 1991
+            ),
+            MAX = Map.of(
+                "producer", "Matthew Vaughn",
+                "interval", 13,
+                "previousWin", 2002,
+                "followingWin", 2015
+            );
+
         Map<String, Object> data = useCase.execute();
 
         assertTrue(data.containsKey("min"), "should have the attribute min");
         Set<Map<String, Object>> min = (Set<Map<String, Object>>) data.get("min");
         checkData(min);
 
+        assertTrue(min.stream().filter(MIN::equals).findFirst().isPresent());
+
         assertTrue(data.containsKey("max"), "should have the attribute max");
         Set<Map<String, Object>> max = (Set<Map<String, Object>>) data.get("max");
         checkData(max);
+
+        assertTrue(max.stream().filter(MAX::equals).findFirst().isPresent());
 
     }
 
